@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// schema.prisma
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Post {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String?
+  published Boolean @default(false)
+  comments Comment[]
+  author   User      @relation(fields: [authorId], references: [id])
+  authorId String    @db.ObjectId
+}
+
+model Weight {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  dateTaken     String
+  measurement   String?
+  approved      Boolean @default(false)
+  patient       User   @relation(fields: [patientId], references: [id])
+  patientId     String @db.ObjectId
+}
+
+// Comments contain a comment string and connect back to the post.
+// postId must have @db.ObjectId to match up with Post's id type
+model Comment {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  post    Post   @relation(fields: [postId], references: [id])
+  postId  String @db.ObjectId
+  comment String
+}
+
+model Account {
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.String
+  access_token       String? @db.String
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.String
+  session_state      String?
+  oauth_token_secret String?
+  oauth_token        String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  profile       Profile?
+  weights       Weight[]
+  posts         Post[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Profile {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?
+  bio           String
+  phoneNumber   String?
+  address       String?
+  image         String?
+  role          Role  @default(USER)
+  messages      Messages[]
+  user          User   @relation(fields: [userId], references: [id])
+  userId        String @unique @db.ObjectId
+}
+
+model Messages {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  profile Profile   @relation(fields: [profileId], references: [id])
+  profileId  String @db.ObjectId
+  message String
+}
+
+model VerificationToken {
+  identifier String   @id @default(auto()) @map("_id") @db.ObjectId
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+
+enum Role {
+  USER
+  PATIENT
+  PHYSICIAN
+  ADMIN
+}
+
+
+// datasource db {
+//   provider = "mongodb"
+//   url      = env("DATABASE_URL")
+// }
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// model User {
+//   id      String   @id @default(auto()) @map("_id") @db.ObjectId
+//   email   String   @unique
+//   name    String?
+//   role    Role     @default(USER)
+//   posts   Post[]
+//   profile Profile?
+// }
+
+// model Profile {
+//   id     String @id @default(auto()) @map("_id") @db.ObjectId
+//   bio    String
+//   user   User   @relation(fields: [userId], references: [id])
+//   userId String @unique @db.ObjectId
+// }
+
+// model Post {
+//   id         String     @id @default(auto()) @map("_id") @db.ObjectId
+//   createdAt  DateTime   @default(now())
+//   title      String
+//   published  Boolean    @default(false)
+//   author     User       @relation(fields: [authorId], references: [id])
+//   authorId   String     @db.ObjectId
+//   categories Category[] @relation(references: [id])
+// }
+
+// model Category {
+//   id    String @id @default(auto()) @map("_id") @db.ObjectId
+//   name  String
+//   posts Post[] @relation(references: [id])
+// }
+
+// enum Role {
+//   USER
+//   ADMIN
+// }
+
+
+// model Post {
+//   id       String    @id @default(auto()) @map("_id") @db.ObjectId
+//   slug     String    @unique
+//   title    String
+//   body     String
+//   comments Comment[]
+//   author   User      @relation(fields: [authorId], references: [id])
+//   authorId String    @db.ObjectId
+// }
+
+// // Comments contain a comment string and connect back to the post.
+// // postId must have @db.ObjectId to match up with Post's id type
+// model Comment {
+//   id      String @id @default(auto()) @map("_id") @db.ObjectId
+//   post    Post   @relation(fields: [postId], references: [id])
+//   postId  String @db.ObjectId
+//   comment String
+// }
+
+// model User {
+//   id    String  @id @default(auto()) @map("_id") @db.ObjectId
+//   email String  @unique
+//   name  String?
+//   posts Post[]
+// }

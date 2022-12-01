@@ -1,0 +1,8 @@
+Need help getting through the debugging process for what is going wrong on my app through PHP Oauth2 fitbit
+https://dev.fitbit.com/build/reference/web-api/developer-guide/authorization/
+
+Also need help to display the json data that is received onto pretty graphs on the web like the following links https://jrtechs.net/data-science/a-closer-look-at-fitbit-data
+https://hydroecology.net/getting-detailed-fitbit-data-with-r/
+
+Issue I am having right now:
+https://stackoverflow.com/questions/74593710/extract-the-authorization-code-from-the-redirect-url
